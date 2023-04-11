@@ -1,23 +1,42 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { Provider } from 'react-redux';
-import { store } from './app/store';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import './index.css';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { init } from 'd2'
+import axios from 'axios'
+import './index.css'
+import App from './components/App'
+import * as serviceWorker from './serviceWorker'
+import dotenv from 'dotenv'
 
-const container = document.getElementById('root');
-const root = createRoot(container);
+import 'typeface-roboto'
 
-root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </React.StrictMode>
-);
+dotenv.config()
+const appName = process.env.REACT_APP_DHIS2_APP_NAME
+const apiVersion = process.env.REACT_APP_DHIS2_API_VERSION
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+export async function getBaseUrl() {
+  if (process.env.NODE_ENV === "development") {
+      const baseUrl = process.env.REACT_APP_DHIS2_BASE_URL || "http://localhost:8080"
+      console.info(`[DEV] DHIS2 instance: ${baseUrl}`)
+      return baseUrl.replace(/\/*$/, "")
+  } else {
+      const { data: manifest } = await axios.get("manifest.webapp")
+      return manifest.activities.dhis.href
+  }
+}
+async function main() {
+  const baseUrl = await getBaseUrl()
+  init({ baseUrl: baseUrl + '/api/' })
+
+  const config = {
+    baseUrl: baseUrl,
+    apiVersion: apiVersion
+  }
+
+  ReactDOM.render(
+    <App config={ config } appName={ appName }/>,
+    document.getElementById("root")
+  )
+  serviceWorker.unregister()
+}
+
+main()
