@@ -9,7 +9,7 @@ const query = {
     },
 }
 
-const MyApp = () => (
+/* const MyApp = () => (
     <div className={classes.container}>
         <DataQuery query={query}>
             {({ error, loading, data }) => {
@@ -26,6 +26,13 @@ const MyApp = () => (
             }}
         </DataQuery>
     </div>
-)
+) */
 
-export default MyApp
+function App() {
+    return (
+        <h1>Hello DHIS</h1>
+
+    );
+}
+
+export default App
